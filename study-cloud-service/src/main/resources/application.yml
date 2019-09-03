@@ -1,0 +1,167 @@
+server:
+  port: 9090
+  servlet:
+    #context-path: /abc
+    application-display-name: @project.name@
+  compression:
+    enabled: true
+  tomcat:
+    max-connections: 500
+    accept-count: 200
+    max-threads: 200
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    name: @project.name@
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: true
+
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 1765000
+      auto-commit: true
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 1800000
+      connection-test-query: "SELECT 1"
+
+  # 缓存
+  redis:
+    database: 10
+    timeout: 3000
+    lettuce:
+      pool:
+        max-idle: 10
+        min-idle: 1
+        max-active: 10
+        max-wait: 1000
+
+  # 自动创建表
+  flyway:
+    enabled: true
+    encoding: UTF-8
+    locations: classpath:db/migration
+    sql-migration-prefix: v
+    baseline-on-migrate: true
+
+
+  # Kafka, 可以是多个地址
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    # 用于观察 kafka 产生/消费消息
+    debug: false
+
+    # 生产者
+    producer:
+      client-id: @project.name@_${random.int[1000,9999]}
+      acks: all
+      retries: 1
+      batch-size: 16KB
+      buffer-memory: 32MB
+      compression-type: gzip
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # transaction-id-prefix: @project.name@
+      properties:
+        partitioner.class: org.apache.kafka.clients.producer.internals.DefaultPartitioner
+        enable.idempotence: true
+
+    # 消费者
+    consumer:
+      group-id: chuan-study_area-refresh
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      auto-offset-reset: latest
+      fetch-min-size: 1
+      heartbeat-interval: 3000ms
+      max-poll-records: 50
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    # 并发监听
+    listener:
+      type: batch
+      concurrency: 5
+
+  # ES
+  data:
+    elasticsearch:
+      cluster-name: chuan-study-elasticsearch
+      cluster-nodes: localhost:9300
+
+
+# 数据库 ORM
+mybatis-plus:
+  type-aliases-package: chuan.study.**.model
+  mapper-locations: classpath*:/mappers/mapper-*.xml
+  type-enums-package: chuan.study.abc.pojo.enums
+  global-config:
+    banner: false
+    db-config:
+      table-underline: true
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 分页插件配置
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+# IP 转换
+qqwry.location: D:/test-data/qqwry.dat
+
+# actuator 相关配置
+info.app.author: chuan jiang
+info.app.encoding: @build.encoding@
+
+---
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/study_cloud?useUnicode=true&useSSL=false&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+    username: JavaApi
+    password: Java4pi
+
+  redis:
+    port: 6379
+    host: 39.104.21.51
+    password: Java4pi
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+logging:
+  path: .
+  level:
+    root: INFO
+    app: DEBUG
+    org.springframework.web: TRACE
+
+
+# 图片验证码，调试时8888
+captcha.debug.enable: true
+
+# 默认启动文档
+springfox.documentation.auto-startup: true
+
+management.endpoints.web.exposure.include: '*'
+management.endpoint.health.show-details: always
