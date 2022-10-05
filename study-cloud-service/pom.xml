@@ -13,7 +13,7 @@
         <protostuff.version>1.5.9</protostuff.version>
         <curator.version>4.2.0</curator.version>
         <kafka.version>2.3.0</kafka.version>
-        <elastic.version>7.2.0</elastic.version>
+        <elastic.version>7.14.0</elastic.version>
 
         <lombok.version>1.18.8</lombok.version>
         <bom.version>1.0.0-SNAPSHOT</bom.version>
